@@ -1,0 +1,265 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<style>
+html,body{margin:0;width:100%;height:100%;background:transparent;overflow:hidden;
+  -webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+#flip{position:absolute;inset:0}
+#flip.left{transform:scaleX(-1)}
+#w{position:absolute;inset:0;transform-origin:50% 85%;
+  transition:transform .22s cubic-bezier(.34,1.56,.64,1)}
+#w.squish{transform:scale(1.08,.88)}
+#w.mini.squish{transform:scale(.94,1.04)}
+#w.hop{animation:hop .45s cubic-bezier(.3,1.6,.5,1)}
+@keyframes hop{0%{transform:translateY(0)}40%{transform:translateY(-14%)}100%{transform:translateY(0)}}
+img{position:absolute;inset:0;width:100%;height:100%;visibility:hidden;pointer-events:none}
+img.on{visibility:visible}
+#cv{position:absolute;inset:0;width:100%;height:100%;visibility:hidden;pointer-events:none;
+  image-rendering:pixelated;image-rendering:crisp-edges}
+#cv.on{visibility:visible}
+/* 贴边斜靠：不改图，整张画布绕靠墙那侧往下转（里侧朝下），再往墙里推一点挡住转出来的空角；左边贴靠时外层 #flip 已镜像 */
+#cv{--lean:12deg;--shift:6%;transform-origin:96% 50%;transition:transform .28s cubic-bezier(.34,1.56,.64,1)}
+#w.mini #cv{transform:translateX(var(--shift)) rotate(calc(var(--lean)*-1))}
+#w.mini #cv.wob{animation:wob .6s ease-out}
+@keyframes wob{0%{transform:translateX(var(--shift)) rotate(calc(var(--lean)*-1))}
+  25%{transform:translateX(var(--shift)) rotate(calc(var(--lean)*.25))}
+  55%{transform:translateX(var(--shift)) rotate(calc(var(--lean)*-1.35))}
+  80%{transform:translateX(var(--shift)) rotate(calc(var(--lean)*-.85))}
+  100%{transform:translateX(var(--shift)) rotate(calc(var(--lean)*-1))}}
+</style></head>
+<body><div id="flip"><div id="w"><canvas id="cv" width="32" height="32"></canvas></div></div>
+<script>
+// ===== 由宿主注入：{ 状态名: dataURI } =====
+var IMGS = /*__IMGS__*/{};
+var CFG  = /*__CFG__*/{ sleepAfterMs: 300000 };
+// ===== 像素序列帧：{ 状态名: [{src,fps,loop,hold}, ...] }（多个 = 随机挑一个）=====
+var SPR  = /*__SPR__*/{};
+
+var w = document.getElementById('w'), flip = document.getElementById('flip');
+var els = {}, cur = null, mode = 'free', side = 'none';
+var flashTimer = null, flashing = false, lastActive = Date.now();
+// 分层状态：flash（一次性反应） > work（跟随对话） > sleep > idle 变体 > 基础待机
+var work = null;          // 当前「工作」动画名（null = 没在干活）
+var lowBattery = false;
+var idleVariant = null, idleVariantUntil = 0, nextVariantAt = Date.now() + 15000;
+
+// 懒加载：只在第一次用到时创建 <img>，省内存
+function el(name) {
+  if (!IMGS[name]) return null;
+  if (!els[name]) { var im = new Image(); im.src = IMGS[name]; els[name] = im; w.appendChild(im); }
+  return els[name];
+}
+function has(name) { return !!IMGS[name] || !!SPR[name]; }
+
+// ---- 像素播放器：一张横排雪碧图，按 fps / hold / loop 逐帧画到 32×32 画布 ----
+var cv = document.getElementById('cv'), cx = cv.getContext('2d');
+cx.imageSmoothingEnabled = false;
+if (CFG.leanDeg != null) cv.style.setProperty('--lean', (+CFG.leanDeg || 0) + 'deg');
+if (CFG.leanShift != null) cv.style.setProperty('--shift', (+CFG.leanShift || 0) + '%');
+function wobble() { cv.classList.remove('wob'); void cv.offsetWidth; cv.classList.add('wob'); }
+var sp = { v: null, img: null, f: 0, n: 1, t: null }, sprCache = {};
+function sprImg(src) { if (!sprCache[src]) { var i = new Image(); i.src = src; sprCache[src] = i; } return sprCache[src]; }
+function sprDraw() {
+  var im = sp.img; if (!im || !im.complete || !im.naturalWidth) return false;
+  sp.n = Math.max(1, Math.round(im.naturalWidth / im.naturalHeight));
+  var fw = im.naturalWidth / sp.n;
+  cx.clearRect(0, 0, 32, 32);
+  cx.drawImage(im, sp.f * fw, 0, fw, im.naturalHeight, 0, 0, 32, 32);
+  return true;
+}
+function sprStep() {
+  if (!sprDraw()) { sp.t = setTimeout(sprStep, 60); return; }
+  var v = sp.v, h = (v.hold && v.hold[sp.f]) || 1;
+  sp.t = setTimeout(function () {
+    if (sp.f + 1 < sp.n) sp.f++;
+    else if (v.loop !== false) sp.f = 0;
+    else return;            // 不循环：停在最后一帧
+    sprStep();
+  }, 1000 / (v.fps || 4) * h);
+}
+function sprStop() { clearTimeout(sp.t); cv.classList.remove('on'); }
+function sprPlay(name) {
+  var vs = SPR[name], v = vs[Math.floor(Math.random() * vs.length)];
+  clearTimeout(sp.t);
+  sp.v = v; sp.f = 0; sp.img = sprImg(v.src);
+  cv.classList.add('on');
+  sprStep();
+}
+
+function play(name, restart) {
+  if (SPR[name]) {
+    if (cur && els[cur]) els[cur].className = '';
+    if (restart || cur !== name || !cv.classList.contains('on')) sprPlay(name);
+    cur = name;
+    return true;
+  }
+  var e = el(name); if (!e) return false;
+  sprStop();
+  if (restart || cur !== name) { if (restart) e.src = IMGS[name] + '#' + Date.now(); }
+  if (cur && els[cur] && cur !== name) els[cur].className = '';
+  e.className = 'on'; cur = name;
+  return true;
+}
+// 迷你模式下把自由模式的动画映射成 mini 版本
+function miniOf(name) {
+  if (mode !== 'mini') return name;
+  if (/^mini_/.test(name)) return name;
+  if (SPR['edge_' + name]) return 'edge_' + name;   // 像素皮肤：有专门的贴边版就用它
+  if (/^(happy|love|shy|wake|double_jump|celebrate)$/.test(name)) return 'mini_happy';
+  if (/^(error|notify|dizzy|annoyed|left|right)$/.test(name)) return 'mini_alert';
+  if (/^(sleep|collapse|doze)$/.test(name)) return 'mini_sleep';
+  if (name === 'think') return 'mini_peek';   // 贴边时思考 = 探头张望
+  if (/^(typing|juggling|ultrathink|building|debugger|reading|designing|wizard|carrying|sweeping)$/.test(name)) return 'mini_typing';
+  return 'mini_idle';
+}
+
+function flash(name, ms) {
+  clearTimeout(flashTimer);
+  flashing = true;
+  play(miniOf(name), true);
+  flashTimer = setTimeout(function () { flashing = false; rest(); }, ms || 2600);
+}
+
+// 当前该显示什么（不含 flash）
+function baseState() {
+  if (work) return miniOf(work);
+  var idle = Date.now() - lastActive;
+  if (idle > CFG.sleepAfterMs) return mode === 'mini' ? 'mini_sleep' : (late() ? 'collapse' : 'sleep');
+  if (mode === 'mini') return 'mini_idle';
+  if (idleVariant && Date.now() < idleVariantUntil) return idleVariant;
+  if (lowBattery && has('low_battery')) return 'low_battery';
+  return 'idle';
+}
+function rest() {
+  if (flashing) return;
+  var s = baseState();
+  if (cur !== s) play(s, true);
+}
+function late() { var h = new Date().getHours(); return h >= 0 && h < 5; }
+
+// 发呆时随机换个小动作
+function idlePool() {
+  var h = new Date().getHours();
+  var p = ['look', 'look', 'reading', 'bubble', 'yawn', 'sweeping', 'carrying', 'designing', 'walk', 'walk', 'wave', 'spin'];
+  if (h >= 6 && h < 10) p.push('coffee', 'coffee', 'yawn');
+  if (h >= 22 || h < 5) p.push('yawn', 'doze', 'doze', 'outlaw');
+  if (CFG.musicIdle) p.push('headphones');
+  p.push('headphones', 'wizard', 'jelly');   // 养成解锁后才会真正出现
+  // 像素皮肤：会敲键盘/开终端/写东西的动作只留给工作态，发呆时不出现
+  if (SPR.idle) {
+    var WORKY = ['reading', 'sweeping', 'carrying', 'outlaw', 'typing', 'building', 'debugger', 'juggling', 'ultrathink'];
+    return p.filter(function (n) { return ['walk', 'wave', 'spin', 'jelly'].indexOf(n) < 0; })   // 这几个现在算解锁动作
+      .filter(unlocked)
+      .map(function (n) { return SPR['idle_' + n] ? 'idle_' + n : n; })   // 有发呆版就用发呆版
+      .filter(function (n) { return WORKY.indexOf(n) < 0; })
+      .filter(has);
+  }
+  return p.filter(has).filter(unlocked);
+}
+// 养成：还没解锁的动作不在发呆里出现
+var LOCKED = (CFG.locked || []).slice();
+function unlocked(name) { return LOCKED.indexOf(name) < 0; }
+window.clawdSetLocked = function (arr) { LOCKED = (arr || []).slice(); };
+function maybeIdleVariant() {
+  if (CFG.idleVariety === false || work || flashing || mode === 'mini') return;
+  var now = Date.now();
+  if (idleVariant && now >= idleVariantUntil) { idleVariant = null; rest(); }
+  if (now < nextVariantAt || now - lastActive > CFG.sleepAfterMs) return;
+  var pool = idlePool();
+  if (pool.length) {
+    idleVariant = pool[Math.floor(Math.random() * pool.length)];
+    idleVariantUntil = now + 6000 + Math.random() * 6000;
+    rest();
+  }
+  var gap = (CFG.idleGapSec || 25) * 1000;
+  nextVariantAt = now + gap * (0.7 + Math.random() * 0.8);
+}
+
+function touchActive() {
+  var wasAsleep = Date.now() - lastActive > CFG.sleepAfterMs;
+  lastActive = Date.now();
+  idleVariant = null;
+  return wasAsleep;
+}
+
+function setMode(m, s) {
+  mode = m; side = s || 'none';
+  flip.className = (m === 'mini' && side === 'left') ? 'left' : '';
+  w.className = m === 'mini' ? 'mini' : '';
+}
+
+// ===== 宿主回调（触摸） =====
+window.clawd = function (e) {
+  var wasAsleep = touchActive();
+  var base = mode === 'mini' ? 'mini ' : '';
+  switch (e) {
+    case 'press':     w.className = base + 'squish'; break;
+    case 'release':   w.className = mode === 'mini' ? 'mini' : ''; break;
+    case 'drag':      clearTimeout(flashTimer); flashing = false; setMode('free'); play('drag', true); break;
+    case 'poke':
+      if (wasAsleep && !work) { flash(mode === 'mini' ? 'mini_peek' : 'wake', 2600); break; }
+      var huh = Math.random() < 0.18;   // 偶尔：被戳了一脸问号
+      if (mode === 'mini') {
+        wobble();
+        if (huh && SPR.edge_poke_huh) flash('edge_poke_huh', 2400);
+        else flash('mini_peek', SPR.mini_peek ? 1600 : 3000);
+      }
+      else if (SPR.poke_huh) flash('poke_huh', 2000);   // 正常状态被戳：固定歪头疑惑
+      else flash(Math.random() < 0.5 ? 'left' : 'right', 1800);
+      break;
+    case 'longpress':
+      if (mode === 'mini') flash('mini_happy', 2600);
+      else flash(unlocked('love') && Math.random() < 0.4 ? 'love' : 'shy', 3000);
+      break;
+    case 'edgeslide':   // 贴边按住上下滑：播 neo_edge（扯一下、贴着）
+      clearTimeout(flashTimer); flashing = true; play('mini_slide', true); break;
+    case 'edgeback':    // 没扯下来、吸回墙上：晃一下回到待机
+      flashing = false; wobble(); rest(); break;
+    case 'fling:left':
+    case 'fling:right': // 甩飞：朝那边飞过去，撞墙后宿主会再发 mini:xx（播 dock）
+      clearTimeout(flashTimer); setMode('free');
+      flip.className = e === 'fling:left' ? 'left' : '';
+      flashing = true; play(SPR.fling ? 'fling' : 'drag', true);
+      flashTimer = setTimeout(function () { flashing = false; flip.className = ''; rest(); }, 2000);
+      break;
+    case 'mini:left':
+    case 'mini:right':
+      setMode('mini', e.slice(5));
+      flash('mini_enter', SPR.mini_enter ? 900 : 3200);
+      break;
+    case 'free':
+      setMode('free');
+      if (SPR.drop) { w.className = ''; flash('drop', 900); break; }   // 像素皮肤：掉下来、落地
+      w.className = 'hop'; flashing = false; rest();
+      setTimeout(function(){ if (w.className === 'hop') w.className = ''; }, 500);
+      break;
+  }
+};
+
+// ===== 供 JS 主控调用 =====
+// 一次性动作；ms=0 表示一直保持（直到下一次 flash/rest）
+window.clawdPlay = function (name, ms) {
+  touchActive();
+  if (ms) flash(name, ms);
+  else { clearTimeout(flashTimer); flashing = false; play(miniOf(name), true); }
+};
+// 持续的「工作」状态；name=null 结束
+window.clawdWork = function (name) {
+  if (name) touchActive();
+  if (work === name) return;
+  work = name || null;
+  rest();
+};
+window.clawdSet = function (o) {
+  if ('lowBattery' in o) lowBattery = !!o.lowBattery;
+  if ('musicIdle' in o) CFG.musicIdle = !!o.musicIdle;
+  rest();
+};
+window.clawdRest = function () { clearTimeout(flashTimer); flashing = false; rest(); };
+window.clawdInit = function (m, s) { setMode(m, s); rest(); };
+window.clawdState = function () { return JSON.stringify({ cur: cur, work: work, mode: mode, flashing: flashing, lowBattery: lowBattery, idleVariant: idleVariant }); };
+
+setInterval(function () { maybeIdleVariant(); rest(); }, 3000);
+
+/*__INIT__*/
+</script></body></html>

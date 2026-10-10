@@ -1,0 +1,396 @@
+{
+  "schema_version": 1,
+  "toolpkg_id": "clawd_pet",
+  "version": "1.0.0",
+  "api_version": "1.0.1",
+  "main": "main.js",
+  "author": [
+    "Mishio & Claude"
+  ],
+  "display_name": {
+    "zh": "ClawdPet 像素桌宠",
+    "en": "ClawdPet"
+  },
+  "description": {
+    "zh": "手机上的 Clawd：像素悬浮桌宠，可贴边探头。双击打字和绑定的对话聊天，回复以分段气泡显示；跟随 AI 的思考/调工具/完成状态做动作，AI 也能用 <clawd> 标签让它冒泡、做动作。非官方粉丝作品，AGPL-3.0 开源。",
+    "en": "Clawd on your phone: a pixel floating pet with edge-peek mode. Double-tap to chat with a bound conversation; it reacts to AI thinking / tool calls and to <clawd> tags. Unofficial fan project, AGPL-3.0."
+  },
+  "enabled_by_default": true,
+  "subpackages": [
+    {
+      "id": "clawd",
+      "entry": "packages/clawd.js",
+      "enabled_by_default": true,
+      "display_name": {
+        "zh": "Clawd 控制",
+        "en": "Clawd Control"
+      },
+      "description": {
+        "zh": "让 Clawd 说话、播动作、贴边，以及管理设置与绑定对话",
+        "en": "Speak, animate, dock, settings"
+      }
+    }
+  ],
+  "resources": [
+    {
+      "key": "clawd_host_dex",
+      "path": "resources/native/clawd_host.dex",
+      "mime": "application/vnd.android.dex"
+    },
+    {
+      "key": "pet_html",
+      "path": "assets/pet.html",
+      "mime": "text/html"
+    },
+    {
+      "key": "bubble_html",
+      "path": "assets/bubble.html",
+      "mime": "text/html"
+    },
+    {
+      "key": "spr_ai_charge",
+      "path": "sprites/ai_charge.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_ai_drag",
+      "path": "sprites/ai_drag.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_ai_error",
+      "path": "sprites/ai_error.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_ai_happy",
+      "path": "sprites/ai_happy.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_ai_idle",
+      "path": "sprites/ai_idle.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_ai_land",
+      "path": "sprites/ai_land.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_ai_look",
+      "path": "sprites/ai_look.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_ai_read",
+      "path": "sprites/ai_read.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_ai_search",
+      "path": "sprites/ai_search.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_ai_sleep",
+      "path": "sprites/ai_sleep.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_ai_talk",
+      "path": "sprites/ai_talk.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_ai_tap",
+      "path": "sprites/ai_tap.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_ai_tool",
+      "path": "sprites/ai_tool.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_ai_type",
+      "path": "sprites/ai_type.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_ai_walk",
+      "path": "sprites/ai_walk.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_ai_wave",
+      "path": "sprites/ai_wave.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_ai_write",
+      "path": "sprites/ai_write.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_neo_angry",
+      "path": "sprites/neo_angry.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_neo_bash",
+      "path": "sprites/neo_bash.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_neo_bash_err",
+      "path": "sprites/neo_bash_err.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_neo_bash_hack",
+      "path": "sprites/neo_bash_hack.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_neo_bash_npm",
+      "path": "sprites/neo_bash_npm.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_neo_bash_test",
+      "path": "sprites/neo_bash_test.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_neo_confused",
+      "path": "sprites/neo_confused.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_neo_dock",
+      "path": "sprites/neo_dock.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_neo_done",
+      "path": "sprites/neo_done.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_neo_drop",
+      "path": "sprites/neo_drop.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_neo_edge",
+      "path": "sprites/neo_edge.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_neo_edge_angry",
+      "path": "sprites/neo_edge_angry.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_neo_edge_bash",
+      "path": "sprites/neo_edge_bash.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_neo_edge_confused",
+      "path": "sprites/neo_edge_confused.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_neo_edge_done",
+      "path": "sprites/neo_edge_done.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_neo_edge_err",
+      "path": "sprites/neo_edge_err.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_neo_edge_happy",
+      "path": "sprites/neo_edge_happy.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_neo_edge_idle",
+      "path": "sprites/neo_edge_idle.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_neo_edge_listen",
+      "path": "sprites/neo_edge_listen.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_neo_edge_look",
+      "path": "sprites/neo_edge_look.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_neo_edge_sad",
+      "path": "sprites/neo_edge_sad.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_neo_edge_search",
+      "path": "sprites/neo_edge_search.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_neo_edge_shock",
+      "path": "sprites/neo_edge_shock.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_neo_edge_shy",
+      "path": "sprites/neo_edge_shy.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_neo_edge_sleep",
+      "path": "sprites/neo_edge_sleep.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_neo_edge_sleep_bubble",
+      "path": "sprites/neo_edge_sleep_bubble.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_neo_edge_sleep_cap",
+      "path": "sprites/neo_edge_sleep_cap.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_neo_edge_think",
+      "path": "sprites/neo_edge_think.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_neo_edge_toast",
+      "path": "sprites/neo_edge_toast.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_neo_edge_type",
+      "path": "sprites/neo_edge_type.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_neo_edge_type_kb",
+      "path": "sprites/neo_edge_type_kb.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_neo_fling",
+      "path": "sprites/neo_fling.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_neo_happy",
+      "path": "sprites/neo_happy.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_neo_jelly_full",
+      "path": "sprites/neo_jelly_full.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_neo_listen",
+      "path": "sprites/neo_listen.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_neo_paint",
+      "path": "sprites/neo_paint.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_neo_poke",
+      "path": "sprites/neo_poke.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_neo_sad",
+      "path": "sprites/neo_sad.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_neo_search",
+      "path": "sprites/neo_search.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_neo_shock",
+      "path": "sprites/neo_shock.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_neo_shy",
+      "path": "sprites/neo_shy.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_neo_sleep_bubble",
+      "path": "sprites/neo_sleep_bubble.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_neo_sleep_cap",
+      "path": "sprites/neo_sleep_cap.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_neo_sleep_jelly",
+      "path": "sprites/neo_sleep_jelly.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_neo_spin",
+      "path": "sprites/neo_spin.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_neo_surf",
+      "path": "sprites/neo_surf.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_neo_toast",
+      "path": "sprites/neo_toast.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_neo_type",
+      "path": "sprites/neo_type.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_neo_type_kb",
+      "path": "sprites/neo_type_kb.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_neo_write_print",
+      "path": "sprites/neo_write_print.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_neo_write_toast",
+      "path": "sprites/neo_write_toast.png",
+      "mime": "image/png"
+    },
+    {
+      "key": "spr_json",
+      "path": "sprites/sprites.json",
+      "mime": "application/json"
+    }
+  ]
+}

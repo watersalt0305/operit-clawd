@@ -1,0 +1,255 @@
+{
+ "ai_charge": {
+  "fps": 3.33
+ },
+ "ai_drag": {
+  "fps": 8.33
+ },
+ "ai_error": {
+  "fps": 11.11
+ },
+ "ai_happy": {
+  "fps": 9.09
+ },
+ "ai_idle": {
+  "fps": 3.85
+ },
+ "ai_land": {
+  "fps": 7.69
+ },
+ "ai_look": {
+  "fps": 3.33
+ },
+ "ai_read": {
+  "fps": 2.86
+ },
+ "ai_search": {
+  "fps": 3.85
+ },
+ "ai_sleep": {
+  "fps": 2.0
+ },
+ "ai_talk": {
+  "fps": 4.55
+ },
+ "ai_tap": {
+  "fps": 6.25
+ },
+ "ai_tool": {
+  "fps": 6.67
+ },
+ "ai_type": {
+  "fps": 9.09
+ },
+ "ai_walk": {
+  "fps": 7.14
+ },
+ "ai_wave": {
+  "fps": 6.25
+ },
+ "ai_write": {
+  "fps": 4.0
+ },
+ "neo_angry": {
+  "fps": 8
+ },
+ "neo_bash": {
+  "fps": 5
+ },
+ "neo_bash_err": {
+  "fps": 5,
+  "loop": false
+ },
+ "neo_bash_hack": {
+  "fps": 8
+ },
+ "neo_bash_npm": {
+  "fps": 4
+ },
+ "neo_bash_test": {
+  "fps": 5
+ },
+ "neo_confused": {
+  "fps": 3
+ },
+ "neo_dock": {
+  "fps": 8,
+  "loop": false
+ },
+ "neo_done": {
+  "fps": 7
+ },
+ "neo_drop": {
+  "fps": 8,
+  "loop": false
+ },
+ "neo_edge": {
+  "fps": 3
+ },
+ "neo_edge_angry": {
+  "fps": 8
+ },
+ "neo_edge_bash": {
+  "fps": 4
+ },
+ "neo_edge_confused": {
+  "fps": 3
+ },
+ "neo_edge_done": {
+  "fps": 6
+ },
+ "neo_edge_err": {
+  "fps": 4,
+  "loop": false
+ },
+ "neo_edge_happy": {
+  "fps": 6
+ },
+ "neo_edge_idle": {
+  "fps": 3.6
+ },
+ "neo_edge_listen": {
+  "fps": 4
+ },
+ "neo_edge_look": {
+  "fps": 3.33
+ },
+ "neo_edge_sad": {
+  "fps": 3
+ },
+ "neo_edge_search": {
+  "fps": 4
+ },
+ "neo_edge_shock": {
+  "fps": 8,
+  "loop": false
+ },
+ "neo_edge_shy": {
+  "fps": 4
+ },
+ "neo_edge_sleep": {
+  "fps": 2
+ },
+ "neo_edge_sleep_bubble": {
+  "fps": 3
+ },
+ "neo_edge_sleep_cap": {
+  "fps": 2
+ },
+ "neo_edge_think": {
+  "fps": 3
+ },
+ "neo_edge_toast": {
+  "fps": 5
+ },
+ "neo_edge_type": {
+  "fps": 6
+ },
+ "neo_edge_type_kb": {
+  "fps": 6
+ },
+ "neo_fling": {
+  "fps": 8,
+  "loop": false
+ },
+ "neo_happy": {
+  "fps": 6
+ },
+ "neo_jelly_full": {
+  "fps": 8,
+  "loop": false,
+  "hold": [
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1.6,
+   1.6,
+   1.6,
+   1.6,
+   1.6,
+   1.6,
+   1.6,
+   1.6,
+   1.6,
+   1.6,
+   1.6,
+   1.6,
+   1.6,
+   1.6,
+   1.6,
+   1.6,
+   1.6,
+   1.6,
+   1.6,
+   1.6,
+   1.6,
+   1.6,
+   1.6,
+   1.6,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1
+  ]
+ },
+ "neo_listen": {
+  "fps": 4
+ },
+ "neo_paint": {
+  "fps": 4
+ },
+ "neo_poke": {
+  "fps": 8,
+  "loop": false
+ },
+ "neo_sad": {
+  "fps": 3
+ },
+ "neo_search": {
+  "fps": 4
+ },
+ "neo_shock": {
+  "fps": 8,
+  "loop": false
+ },
+ "neo_shy": {
+  "fps": 4
+ },
+ "neo_sleep_bubble": {
+  "fps": 3
+ },
+ "neo_sleep_cap": {
+  "fps": 2
+ },
+ "neo_sleep_jelly": {
+  "fps": 2
+ },
+ "neo_spin": {
+  "fps": 8
+ },
+ "neo_surf": {
+  "fps": 6
+ },
+ "neo_toast": {
+  "fps": 6
+ },
+ "neo_type": {
+  "fps": 6
+ },
+ "neo_type_kb": {
+  "fps": 6
+ },
+ "neo_write_print": {
+  "fps": 5
+ },
+ "neo_write_toast": {
+  "fps": 6
+ }
+}
